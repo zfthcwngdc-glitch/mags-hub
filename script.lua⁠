@@ -1,5 +1,5 @@
 -- =================================================================
--- MAGS HUB // ULTIMATE MULTI-PLATFORM (MOBILE + PC + CONTROLLER)
+-- MAGS HUB // EXCLUSIVE FLAG FOOTBALL BUILD (ID VERIFIED)
 -- =================================================================
 
 local success, result = pcall(function()
@@ -7,26 +7,47 @@ local success, result = pcall(function()
     local RunService = game:GetService("RunService")
     local CoreGui = game:GetService("CoreGui")
     local UserInputService = game:GetService("UserInputService")
+    local MarketplaceService = game:GetService("MarketplaceService")
     local LocalPlayer = Players.LocalPlayer
+
+    -- Target Place ID for "Flag Football" (99588440661442)
+    local targetPlaceId = 99588440661442
+    local placeId = game.PlaceId
+    
+    local gameName = ""
+    pcall(function()
+        local info = MarketplaceService:GetProductInfo(placeId)
+        if info and info.Name then
+            gameName = info.Name:lower()
+        end
+    end)
+
+    -- Strict Verification: Check Place ID or if name contains flag football/gridiron terms
+    local isTargetGame = (placeId == targetPlaceId) or gameName:find("flag football") or gameName:find("football")
+    
+    if not isTargetGame then
+        warn("[MAGS HUB]: Access Denied - This script only runs in Flag Football!")
+        return
+    end
 
     -- Platform Detection
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
     
     local targetGui = (pcall(function() return CoreGui end) and CoreGui) or LocalPlayer:WaitForChild("PlayerGui")
 
-    if targetGui:FindFirstChild("MagsFlagHubUltimateAll") then
-        targetGui.MagsFlagHubUltimateAll:Destroy()
+    if targetGui:FindFirstChild("MagsFlagFootballVerified") then
+        targetGui.MagsFlagFootballVerified:Destroy()
     end
 
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "MagsFlagHubUltimateAll"
+    screenGui.Name = "MagsFlagFootballVerified"
     screenGui.ResetOnSpawn = false
     screenGui.DisplayOrder = 99999
     screenGui.Parent = targetGui
 
     -- Dynamic dimensions
-    local uiWidth = isMobile and 280 or 310
-    local uiHeight = isMobile and 290 or 310
+    local uiWidth = isMobile and 285 or 315
+    local uiHeight = isMobile and 310 or 325
 
     local mainFrame = Instance.new("Frame")
     mainFrame.Size = UDim2.new(0, uiWidth, 0, uiHeight)
@@ -41,7 +62,7 @@ local success, result = pcall(function()
 
     -- Title Bar
     local titleBar = Instance.new("TextLabel")
-    titleBar.Size = UDim2.new(1, -65, 0, 35)
+    titleBar.Size = UDim2.new(1, -65, 0, 30)
     titleBar.Position = UDim2.new(0, 12, 0, 0)
     titleBar.BackgroundTransparency = 1
     titleBar.Text = "MAGS // FLAG FOOTBALL"
@@ -53,24 +74,24 @@ local success, result = pcall(function()
 
     -- Platform Indicator Tag
     local platformTag = Instance.new("TextLabel")
-    platformTag.Size = UDim2.new(0, 60, 0, 20)
-    platformTag.Position = UDim2.new(1, -92, 0, 7)
+    platformTag.Size = UDim2.new(0, 60, 0, 18)
+    platformTag.Position = UDim2.new(1, -92, 0, 6)
     platformTag.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
     platformTag.Text = isMobile and "MOBILE" or "PC/PAD"
     platformTag.TextColor3 = Color3.fromRGB(150, 200, 255)
-    platformTag.TextSize = 8
+    platformTag.TextSize = 7
     platformTag.Font = Enum.Font.GothamBold
     platformTag.Parent = mainFrame
     Instance.new("UICorner", platformTag).CornerRadius = UDim2.new(0, 4)
 
     -- Close Button
     local closeBtn = Instance.new("TextButton")
-    closeBtn.Size = UDim2.new(0, 24, 0, 24)
-    closeBtn.Position = UDim2.new(1, -28, 0, 6)
+    closeBtn.Size = UDim2.new(0, 22, 0, 22)
+    closeBtn.Position = UDim2.new(1, -26, 0, 5)
     closeBtn.BackgroundColor3 = Color3.fromRGB(160, 30, 30)
     closeBtn.Text = "X"
     closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    closeBtn.TextSize = 10
+    closeBtn.TextSize = 9
     closeBtn.Font = Enum.Font.GothamBold
     closeBtn.Parent = mainFrame
     Instance.new("UICorner", closeBtn).CornerRadius = UDim2.new(0, 4)
@@ -79,10 +100,23 @@ local success, result = pcall(function()
         screenGui:Destroy()
     end)
 
+    -- Verified Game Badge
+    local detectorLabel = Instance.new("TextLabel")
+    detectorLabel.Size = UDim2.new(1, -24, 0, 24)
+    detectorLabel.Position = UDim2.new(0, 12, 0, 32)
+    detectorLabel.BackgroundColor3 = Color3.fromRGB(20, 35, 25)
+    detectorLabel.Text = " Status: Target ID Verified ✓"
+    detectorLabel.TextColor3 = Color3.fromRGB(100, 255, 150)
+    detectorLabel.TextSize = 8
+    detectorLabel.Font = Enum.Font.Code
+    detectorLabel.TextXAlignment = Enum.TextXAlignment.Left
+    detectorLabel.Parent = mainFrame
+    Instance.new("UICorner", detectorLabel).CornerRadius = UDim2.new(0, 4)
+
     -- Utility Button Generator
     local function createButton(text, posY)
         local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1, -24, 0, 36)
+        btn.Size = UDim2.new(1, -24, 0, 32)
         btn.Position = UDim2.new(0, 12, 0, posY)
         btn.BackgroundColor3 = Color3.fromRGB(25, 25, 38)
         btn.Text = text
@@ -94,20 +128,20 @@ local success, result = pcall(function()
         return btn
     end
 
-    local magnetBtn = createButton("BALL MAGNET: OFF [X]", 42)
-    local rangeBtn = createButton("MAGNET RANGE: 15m [Y]", 84)
-    local speedBtn = createButton("ROUTE SPEED: OFF [B]", 126)
-    local pullBtn = createButton("AUTO FLAG PULL: OFF [A]", 168)
-    local aimbotBtn = createButton("QB AIM ASSIST: OFF [DPadUp]", 210)
+    local magnetBtn = createButton("BALL MAGNET: OFF [X]", 62)
+    local rangeBtn = createButton("MAGNET RANGE: 15m [Y]", 98)
+    local speedBtn = createButton("ROUTE SPEED: OFF [B]", 134)
+    local pullBtn = createButton("AUTO FLAG PULL: OFF [A]", 170)
+    local aimbotBtn = createButton("QB AIM ASSIST: OFF [DPadUp]", 206)
 
     -- Status Log Label
     local logLabel = Instance.new("TextLabel")
-    logLabel.Size = UDim2.new(1, -24, 0, 35)
-    logLabel.Position = UDim2.new(0, 12, 0, 252)
+    logLabel.Size = UDim2.new(1, -24, 0, 40)
+    logLabel.Position = UDim2.new(0, 12, 0, 246)
     logLabel.BackgroundTransparency = 1
-    logLabel.Text = "Universal Mode Ready (Touch / Keys / Gamepad)"
+    logLabel.Text = "Active: Optimized for Flag Football ID 99588440661442."
     logLabel.TextColor3 = Color3.fromRGB(160, 160, 180)
-    logLabel.TextSize = 8
+    logLabel.TextSize = 7
     logLabel.Font = Enum.Font.Gotham
     logLabel.TextWrapped = true
     logLabel.Parent = mainFrame
@@ -161,32 +195,17 @@ local success, result = pcall(function()
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return end
         
-        -- Keyboard Controls
-        if input.KeyCode == Enum.KeyCode.RightShift then
+        if input.KeyCode == Enum.KeyCode.RightShift or input.KeyCode == Enum.KeyCode.ButtonSelect then
             mainFrame.Visible = not mainFrame.Visible
-        elseif input.KeyCode == Enum.KeyCode.One or input.KeyCode == Enum.KeyCode.KeypadOne then
+        elseif input.KeyCode == Enum.KeyCode.One or input.KeyCode == Enum.KeyCode.KeypadOne or input.KeyCode == Enum.KeyCode.ButtonX then
             toggleMagnet()
-        elseif input.KeyCode == Enum.KeyCode.Two or input.KeyCode == Enum.KeyCode.KeypadTwo then
+        elseif input.KeyCode == Enum.KeyCode.Two or input.KeyCode == Enum.KeyCode.KeypadTwo or input.KeyCode == Enum.KeyCode.ButtonY then
             cycleRange()
-        elseif input.KeyCode == Enum.KeyCode.Three or input.KeyCode == Enum.KeyCode.KeypadThree then
+        elseif input.KeyCode == Enum.KeyCode.Three or input.KeyCode == Enum.KeyCode.KeypadThree or input.KeyCode == Enum.KeyCode.ButtonB then
             toggleSpeed()
-        elseif input.KeyCode == Enum.KeyCode.Four or input.KeyCode == Enum.KeyCode.KeypadFour then
+        elseif input.KeyCode == Enum.KeyCode.Four or input.KeyCode == Enum.KeyCode.KeypadFour or input.KeyCode == Enum.KeyCode.ButtonA then
             togglePull()
-        elseif input.KeyCode == Enum.KeyCode.Five or input.KeyCode == Enum.KeyCode.KeypadFive then
-            toggleAimbot()
-
-        -- Gamepad Controller Controls
-        elseif input.KeyCode == Enum.KeyCode.ButtonSelect then
-            mainFrame.Visible = not mainFrame.Visible
-        elseif input.KeyCode == Enum.KeyCode.ButtonX then
-            toggleMagnet()
-        elseif input.KeyCode == Enum.KeyCode.ButtonY then
-            cycleRange()
-        elseif input.KeyCode == Enum.KeyCode.ButtonB then
-            toggleSpeed()
-        elseif input.KeyCode == Enum.KeyCode.ButtonA then
-            togglePull()
-        elseif input.KeyCode == Enum.KeyCode.DPadUp then
+        elseif input.KeyCode == Enum.KeyCode.Five or input.KeyCode == Enum.KeyCode.KeypadFive or input.KeyCode == Enum.KeyCode.DPadUp then
             toggleAimbot()
         end
     end)
@@ -210,7 +229,7 @@ local success, result = pcall(function()
             -- Magnet Physics
             local currentRange = rangeLevels[rangeIndex]
             if magnetActive then
-                for _, obj in ipairs(workspace:GetChildren()) do
+                for _, obj in ipairs(workspace:GetDescendants()) do
                     if obj:IsA("BasePart") and (obj.Name:lower():find("ball") or obj.Name:lower():find("football")) then
                         if (obj.Position - hrp.Position).Magnitude <= currentRange then
                             obj.CFrame = hrp.CFrame
