@@ -1,0 +1,150 @@
+-- =================================================================
+-- MAGS HUB // SECURE LOADER & MENU INITIALIZER
+-- =================================================================
+
+local success, result = pcall(function()
+    -- Direct execution payload wrapper for Mags Hub
+    local Players = game:GetService("Players")
+    local RunService = game:GetService("RunService")
+    local CoreGui = game:GetService("CoreGui")
+    local LocalPlayer = Players.LocalPlayer
+
+    local targetGui = (pcall(function() return CoreGui end) and CoreGui) or LocalPlayer:WaitForChild("PlayerGui")
+
+    if targetGui:FindFirstChild("MagsFlagHubFixed") then
+        targetGui.MagsFlagHubFixed:Destroy()
+    end
+
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "MagsFlagHubFixed"
+    screenGui.ResetOnSpawn = false
+    screenGui.DisplayOrder = 99999
+    screenGui.Parent = targetGui
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 260, 0, 275)
+    mainFrame.Position = UDim2.new(0.5, -130, 0.2, 0)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 18)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Active = true
+    mainFrame.Draggable = true
+    mainFrame.Parent = screenGui
+
+    Instance.new("UICorner", mainFrame).CornerRadius = UDim2.new(0, 8)
+
+    local titleBar = Instance.new("TextLabel")
+    titleBar.Size = UDim2.new(1, -40, 0, 32)
+    titleBar.Position = UDim2.new(0, 12, 0, 0)
+    titleBar.BackgroundTransparency = 1
+    titleBar.Text = "MAGS // LOADSTRING BUILD"
+    titleBar.TextColor3 = Color3.fromRGB(255, 160, 40)
+    titleBar.TextSize = 10
+    titleBar.Font = Enum.Font.GothamBold
+    titleBar.TextXAlignment = Enum.TextXAlignment.Left
+    titleBar.Parent = mainFrame
+
+    local closeBtn = Instance.new("TextButton")
+    closeBtn.Size = UDim2.new(0, 24, 0, 24)
+    closeBtn.Position = UDim2.new(1, -28, 0, 4)
+    closeBtn.BackgroundColor3 = Color3.fromRGB(160, 30, 30)
+    closeBtn.Text = "X"
+    closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeBtn.TextSize = 10
+    closeBtn.Font = Enum.Font.GothamBold
+    closeBtn.Parent = mainFrame
+    Instance.new("UICorner", closeBtn).CornerRadius = UDim2.new(0, 4)
+
+    closeBtn.MouseButton1Click:Connect(function()
+        screenGui:Destroy()
+    end)
+
+    local function createButton(text, posY)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, -24, 0, 34)
+        btn.Position = UDim2.new(0, 12, 0, posY)
+        btn.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+        btn.Text = text
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.TextSize = 9
+        btn.Font = Enum.Font.GothamBold
+        btn.Parent = mainFrame
+        Instance.new("UICorner", btn).CornerRadius = UDim2.new(0, 5)
+        return btn
+    end
+
+    local magnetBtn = createButton("BALL MAGNET: OFF", 40)
+    local rangeBtn = createButton("MAGNET RANGE: 15m", 80)
+    local speedBtn = createButton("ROUTE SPEED: OFF", 120)
+    local pullBtn = createButton("AUTO FLAG PULL: OFF", 160)
+
+    local logLabel = Instance.new("TextLabel")
+    logLabel.Size = UDim2.new(1, -24, 0, 45)
+    logLabel.Position = UDim2.new(0, 12, 0, 204)
+    logLabel.BackgroundTransparency = 1
+    logLabel.Text = "Loadstring executed successfully."
+    logLabel.TextColor3 = Color3.fromRGB(160, 160, 180)
+    logLabel.TextSize = 8
+    logLabel.Font = Enum.Font.Gotham
+    logLabel.TextWrapped = true
+    logLabel.Parent = mainFrame
+
+    local magnetActive = false
+    local rangeLevels = {15, 30, 50}
+    local rangeIndex = 1
+    local speedActive = false
+    local pullActive = false
+
+    magnetBtn.MouseButton1Click:Connect(function()
+        magnetActive = not magnetActive
+        magnetBtn.BackgroundColor3 = magnetActive and Color3.fromRGB(210, 120, 20) or Color3.fromRGB(35, 35, 50)
+        magnetBtn.Text = magnetActive and "BALL MAGNET: ACTIVE" or "BALL MAGNET: OFF"
+    end)
+
+    rangeBtn.MouseButton1Click:Connect(function()
+        rangeIndex = rangeIndex % #rangeLevels + 1
+        rangeBtn.Text = "MAGNET RANGE: " .. rangeLevels[rangeIndex] .."m"
+    end)
+
+    speedBtn.MouseButton1Click:Connect(function()
+        speedActive = not speedActive
+        speedBtn.BackgroundColor3 = speedActive and Color3.fromRGB(210, 120, 20) or Color3.fromRGB(35, 35, 50)
+        speedBtn.Text = speedActive and "ROUTE SPEED: ACTIVE" or "ROUTE SPEED: OFF"
+    end)
+
+    pullBtn.MouseButton1Click:Connect(function()
+        pullActive = not pullActive
+        pullBtn.BackgroundColor3 = pullActive and Color3.fromRGB(210, 120, 20) or Color3.fromRGB(35, 35, 50)
+        pullBtn.Text = pullActive and "AUTO FLAG PULL: ACTIVE" or "AUTO FLAG PULL: OFF"
+    end)
+
+    RunService.RenderStepped:Connect(function()
+        pcall(function()
+            local char = LocalPlayer.Character
+            if not char then return end
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            if not hrp or not humanoid then return end
+
+            if speedActive then
+                if humanoid.WalkSpeed ~= 22 then humanoid.WalkSpeed = 22 end
+            else
+                if humanoid.WalkSpeed == 22 then humanoid.WalkSpeed = 16 end
+            end
+
+            local currentRange = rangeLevels[rangeIndex]
+            if magnetActive then
+                for _, obj in ipairs(workspace:GetChildren()) do
+                    if obj:IsA("BasePart") and (obj.Name:lower():find("ball") or obj.Name:lower():find("football")) then
+                        if (obj.Position - hrp.Position).Magnitude <= currentRange then
+                            obj.CFrame = hrp.CFrame
+                        end
+                    end
+                end
+            end
+        end)
+    end)
+end)
+
+if not success then
+    warn("Mags Hub Load Error: " .. tostring(result))
+end
