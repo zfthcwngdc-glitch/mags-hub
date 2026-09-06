@@ -1,30 +1,37 @@
 -- =================================================================
--- MAGS HUB // SECURE LOADER & MENU INITIALIZER
+-- MAGS HUB // ULTIMATE MULTI-PLATFORM (MOBILE + PC + CONTROLLER)
 -- =================================================================
 
 local success, result = pcall(function()
-    -- Direct execution payload wrapper for Mags Hub
     local Players = game:GetService("Players")
     local RunService = game:GetService("RunService")
     local CoreGui = game:GetService("CoreGui")
+    local UserInputService = game:GetService("UserInputService")
     local LocalPlayer = Players.LocalPlayer
 
+    -- Platform Detection
+    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+    
     local targetGui = (pcall(function() return CoreGui end) and CoreGui) or LocalPlayer:WaitForChild("PlayerGui")
 
-    if targetGui:FindFirstChild("MagsFlagHubFixed") then
-        targetGui.MagsFlagHubFixed:Destroy()
+    if targetGui:FindFirstChild("MagsFlagHubUltimateAll") then
+        targetGui.MagsFlagHubUltimateAll:Destroy()
     end
 
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "MagsFlagHubFixed"
+    screenGui.Name = "MagsFlagHubUltimateAll"
     screenGui.ResetOnSpawn = false
     screenGui.DisplayOrder = 99999
     screenGui.Parent = targetGui
 
+    -- Dynamic dimensions
+    local uiWidth = isMobile and 280 or 310
+    local uiHeight = isMobile and 290 or 310
+
     local mainFrame = Instance.new("Frame")
-    mainFrame.Size = UDim2.new(0, 260, 0, 275)
-    mainFrame.Position = UDim2.new(0.5, -130, 0.2, 0)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 18)
+    mainFrame.Size = UDim2.new(0, uiWidth, 0, uiHeight)
+    mainFrame.Position = UDim2.new(0.5, -uiWidth/2, 0.2, 0)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 22)
     mainFrame.BorderSizePixel = 0
     mainFrame.Active = true
     mainFrame.Draggable = true
@@ -32,20 +39,34 @@ local success, result = pcall(function()
 
     Instance.new("UICorner", mainFrame).CornerRadius = UDim2.new(0, 8)
 
+    -- Title Bar
     local titleBar = Instance.new("TextLabel")
-    titleBar.Size = UDim2.new(1, -40, 0, 32)
+    titleBar.Size = UDim2.new(1, -65, 0, 35)
     titleBar.Position = UDim2.new(0, 12, 0, 0)
     titleBar.BackgroundTransparency = 1
-    titleBar.Text = "MAGS // LOADSTRING BUILD"
-    titleBar.TextColor3 = Color3.fromRGB(255, 160, 40)
+    titleBar.Text = "MAGS // FLAG FOOTBALL"
+    titleBar.TextColor3 = Color3.fromRGB(255, 165, 30)
     titleBar.TextSize = 10
     titleBar.Font = Enum.Font.GothamBold
     titleBar.TextXAlignment = Enum.TextXAlignment.Left
     titleBar.Parent = mainFrame
 
+    -- Platform Indicator Tag
+    local platformTag = Instance.new("TextLabel")
+    platformTag.Size = UDim2.new(0, 60, 0, 20)
+    platformTag.Position = UDim2.new(1, -92, 0, 7)
+    platformTag.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+    platformTag.Text = isMobile and "MOBILE" or "PC/PAD"
+    platformTag.TextColor3 = Color3.fromRGB(150, 200, 255)
+    platformTag.TextSize = 8
+    platformTag.Font = Enum.Font.GothamBold
+    platformTag.Parent = mainFrame
+    Instance.new("UICorner", platformTag).CornerRadius = UDim2.new(0, 4)
+
+    -- Close Button
     local closeBtn = Instance.new("TextButton")
     closeBtn.Size = UDim2.new(0, 24, 0, 24)
-    closeBtn.Position = UDim2.new(1, -28, 0, 4)
+    closeBtn.Position = UDim2.new(1, -28, 0, 6)
     closeBtn.BackgroundColor3 = Color3.fromRGB(160, 30, 30)
     closeBtn.Text = "X"
     closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -58,65 +79,119 @@ local success, result = pcall(function()
         screenGui:Destroy()
     end)
 
+    -- Utility Button Generator
     local function createButton(text, posY)
         local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1, -24, 0, 34)
+        btn.Size = UDim2.new(1, -24, 0, 36)
         btn.Position = UDim2.new(0, 12, 0, posY)
-        btn.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+        btn.BackgroundColor3 = Color3.fromRGB(25, 25, 38)
         btn.Text = text
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.TextColor3 = Color3.fromRGB(240, 240, 240)
         btn.TextSize = 9
         btn.Font = Enum.Font.GothamBold
         btn.Parent = mainFrame
-        Instance.new("UICorner", btn).CornerRadius = UDim2.new(0, 5)
+        Instance.new("UICorner", btn).CornerRadius = UDim2.new(0, 6)
         return btn
     end
 
-    local magnetBtn = createButton("BALL MAGNET: OFF", 40)
-    local rangeBtn = createButton("MAGNET RANGE: 15m", 80)
-    local speedBtn = createButton("ROUTE SPEED: OFF", 120)
-    local pullBtn = createButton("AUTO FLAG PULL: OFF", 160)
+    local magnetBtn = createButton("BALL MAGNET: OFF [X]", 42)
+    local rangeBtn = createButton("MAGNET RANGE: 15m [Y]", 84)
+    local speedBtn = createButton("ROUTE SPEED: OFF [B]", 126)
+    local pullBtn = createButton("AUTO FLAG PULL: OFF [A]", 168)
+    local aimbotBtn = createButton("QB AIM ASSIST: OFF [DPadUp]", 210)
 
+    -- Status Log Label
     local logLabel = Instance.new("TextLabel")
-    logLabel.Size = UDim2.new(1, -24, 0, 45)
-    logLabel.Position = UDim2.new(0, 12, 0, 204)
+    logLabel.Size = UDim2.new(1, -24, 0, 35)
+    logLabel.Position = UDim2.new(0, 12, 0, 252)
     logLabel.BackgroundTransparency = 1
-    logLabel.Text = "Loadstring executed successfully."
+    logLabel.Text = "Universal Mode Ready (Touch / Keys / Gamepad)"
     logLabel.TextColor3 = Color3.fromRGB(160, 160, 180)
     logLabel.TextSize = 8
     logLabel.Font = Enum.Font.Gotham
     logLabel.TextWrapped = true
     logLabel.Parent = mainFrame
 
+    -- States
     local magnetActive = false
     local rangeLevels = {15, 30, 50}
     local rangeIndex = 1
     local speedActive = false
     local pullActive = false
+    local aimbotActive = false
 
-    magnetBtn.MouseButton1Click:Connect(function()
+    -- Feature Functions
+    local function toggleMagnet()
         magnetActive = not magnetActive
-        magnetBtn.BackgroundColor3 = magnetActive and Color3.fromRGB(210, 120, 20) or Color3.fromRGB(35, 35, 50)
-        magnetBtn.Text = magnetActive and "BALL MAGNET: ACTIVE" or "BALL MAGNET: OFF"
-    end)
+        magnetBtn.BackgroundColor3 = magnetActive and Color3.fromRGB(210, 120, 20) or Color3.fromRGB(25, 25, 38)
+        magnetBtn.Text = magnetActive and "BALL MAGNET: ACTIVE [X]" or "BALL MAGNET: OFF [X]"
+    end
 
-    rangeBtn.MouseButton1Click:Connect(function()
+    local function cycleRange()
         rangeIndex = rangeIndex % #rangeLevels + 1
-        rangeBtn.Text = "MAGNET RANGE: " .. rangeLevels[rangeIndex] .."m"
-    end)
+        rangeBtn.Text = "MAGNET RANGE: " .. rangeLevels[rangeIndex] .. "m [Y]"
+    end
 
-    speedBtn.MouseButton1Click:Connect(function()
+    local function toggleSpeed()
         speedActive = not speedActive
-        speedBtn.BackgroundColor3 = speedActive and Color3.fromRGB(210, 120, 20) or Color3.fromRGB(35, 35, 50)
-        speedBtn.Text = speedActive and "ROUTE SPEED: ACTIVE" or "ROUTE SPEED: OFF"
-    end)
+        speedBtn.BackgroundColor3 = speedActive and Color3.fromRGB(210, 120, 20) or Color3.fromRGB(25, 25, 38)
+        speedBtn.Text = speedActive and "ROUTE SPEED: ACTIVE [B]" or "ROUTE SPEED: OFF [B]"
+    end
 
-    pullBtn.MouseButton1Click:Connect(function()
+    local function togglePull()
         pullActive = not pullActive
-        pullBtn.BackgroundColor3 = pullActive and Color3.fromRGB(210, 120, 20) or Color3.fromRGB(35, 35, 50)
-        pullBtn.Text = pullActive and "AUTO FLAG PULL: ACTIVE" or "AUTO FLAG PULL: OFF"
+        pullBtn.BackgroundColor3 = pullActive and Color3.fromRGB(210, 120, 20) or Color3.fromRGB(25, 25, 38)
+        pullBtn.Text = pullActive and "AUTO FLAG PULL: ACTIVE [A]" or "AUTO FLAG PULL: OFF [A]"
+    end
+
+    local function toggleAimbot()
+        aimbotActive = not aimbotActive
+        aimbotBtn.BackgroundColor3 = aimbotActive and Color3.fromRGB(210, 120, 20) or Color3.fromRGB(25, 25, 38)
+        aimbotBtn.Text = aimbotActive and "QB AIM ASSIST: ACTIVE [DPadUp]" or "QB AIM ASSIST: OFF [DPadUp]"
+    end
+
+    -- Mouse / Touch Clicks
+    magnetBtn.MouseButton1Click:Connect(toggleMagnet)
+    rangeBtn.MouseButton1Click:Connect(cycleRange)
+    speedBtn.MouseButton1Click:Connect(toggleSpeed)
+    pullBtn.MouseButton1Click:Connect(togglePull)
+    aimbotBtn.MouseButton1Click:Connect(toggleAimbot)
+
+    -- Keyboard & Gamepad Input Handler
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
+        
+        -- Keyboard Controls
+        if input.KeyCode == Enum.KeyCode.RightShift then
+            mainFrame.Visible = not mainFrame.Visible
+        elseif input.KeyCode == Enum.KeyCode.One or input.KeyCode == Enum.KeyCode.KeypadOne then
+            toggleMagnet()
+        elseif input.KeyCode == Enum.KeyCode.Two or input.KeyCode == Enum.KeyCode.KeypadTwo then
+            cycleRange()
+        elseif input.KeyCode == Enum.KeyCode.Three or input.KeyCode == Enum.KeyCode.KeypadThree then
+            toggleSpeed()
+        elseif input.KeyCode == Enum.KeyCode.Four or input.KeyCode == Enum.KeyCode.KeypadFour then
+            togglePull()
+        elseif input.KeyCode == Enum.KeyCode.Five or input.KeyCode == Enum.KeyCode.KeypadFive then
+            toggleAimbot()
+
+        -- Gamepad Controller Controls
+        elseif input.KeyCode == Enum.KeyCode.ButtonSelect then
+            mainFrame.Visible = not mainFrame.Visible
+        elseif input.KeyCode == Enum.KeyCode.ButtonX then
+            toggleMagnet()
+        elseif input.KeyCode == Enum.KeyCode.ButtonY then
+            cycleRange()
+        elseif input.KeyCode == Enum.KeyCode.ButtonB then
+            toggleSpeed()
+        elseif input.KeyCode == Enum.KeyCode.ButtonA then
+            togglePull()
+        elseif input.KeyCode == Enum.KeyCode.DPadUp then
+            toggleAimbot()
+        end
     end)
 
+    -- Execution Loop
     RunService.RenderStepped:Connect(function()
         pcall(function()
             local char = LocalPlayer.Character
@@ -125,12 +200,14 @@ local success, result = pcall(function()
             local humanoid = char:FindFirstChildOfClass("Humanoid")
             if not hrp or not humanoid then return end
 
+            -- Speed Mod
             if speedActive then
                 if humanoid.WalkSpeed ~= 22 then humanoid.WalkSpeed = 22 end
             else
                 if humanoid.WalkSpeed == 22 then humanoid.WalkSpeed = 16 end
             end
 
+            -- Magnet Physics
             local currentRange = rangeLevels[rangeIndex]
             if magnetActive then
                 for _, obj in ipairs(workspace:GetChildren()) do
@@ -146,5 +223,5 @@ local success, result = pcall(function()
 end)
 
 if not success then
-    warn("Mags Hub Load Error: " .. tostring(result))
+    warn("Mags Hub Initialization Error: " .. tostring(result))
 end
